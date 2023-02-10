@@ -13,7 +13,7 @@ const OrangeButton = ({
     <Button
       className={clsx(
         selected
-          ? ` hover:brightness-[110%] ${OrangeButtonClassName}`
+          ? ` hover:brightness-[120%] ${OrangeButtonClassName}`
           : `${OrangeButtonClassName}`,
         className
       )}

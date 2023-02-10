@@ -7,11 +7,14 @@ module.exports = {
         consolas: "consolas",
       },
       gridTemplateColumns: {
-        calculator: "repeat(4, 6rem)",
+        calculator: "repeat(4, 5rem)",
       },
-      gridTemplateRows: {
-        calculator: "minmax(6rem, auto), repeat(5, 6rem)",
+      gridAutoRows: {
+        calculator: "5rem",
       },
+      // gridTemplateRows: {
+      //   calculator: "minmax(6rem, auto), repeat(5, 6rem)",
+      // },
       boxShadow: {
         calculatorContainer:
           "25px 25px 75px rgba(0,0,0,0.25), 10px 10px 70px rgba(0,0,0,0.25), inset -5px -5px 15px rgba(0,0,0,0.5), inset 5px 5px 15px rgba(0,0,0,0.5)",

@@ -8,7 +8,7 @@ export type ButtonProps = {
   className?: string;
 };
 
-const Button = ({ children, onClick, className, ...props }: ButtonProps) => {
+const Button = ({ children, className, ...props }: ButtonProps) => {
   return (
     <button className={clsx(`${ButtonClassName}`, className)} {...props}>
       <i className="relative not-italic text-[25px] uppercase">{children}</i>
