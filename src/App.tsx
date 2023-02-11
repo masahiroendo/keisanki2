@@ -10,7 +10,7 @@ import {
   RiAddLine,
   RiSubtractLine,
 } from "react-icons/ri";
-import { AiOutlineClear } from "react-icons/ai";
+import { AiOutlineClear, AiOutlinePercentage } from "react-icons/ai";
 import { TbEqual } from "react-icons/tb";
 import { IconType } from "react-icons";
 
@@ -51,7 +51,7 @@ const enum REDUCER_ACTION {
   OPERATE,
   CLEAR,
   DELETE_DIGIT,
-  CALCULATE,
+  EQUAL,
   PERCENT,
 }
 
@@ -66,22 +66,31 @@ const calculatorReducer = (
 ): CalculatorState => {
   switch (type) {
     case REDUCER_ACTION.ADD_DIGIT:
-      if (state.overwrite) {
+      if (state.overwrite && state.currentOperand === "" && payload !== ".") {
         return {
           ...state,
           currentOperand: payload,
           overwrite: false,
         };
       }
-      const num = Number(state.currentOperand + payload);
-      if (Number.isNaN(num)) {
-        // if (state.currentOperand.includes(".") && payload === ".") {
-        //   return state;
-        // }
-        // if (state.currentOperand === "0" && payload === "0") {
-        //   return state;
-        // }
-        return { ...state };
+
+      if (
+        state.currentOperand === "" &&
+        !!state.previousOperand &&
+        payload === "."
+      ) {
+        return {
+          ...state,
+          currentOperand: "0" + payload,
+          overwrite: false,
+        };
+      }
+
+      if (state.currentOperand.includes(".") && payload === ".") {
+        return state;
+      }
+      if (state.currentOperand === "0" && payload === "0") {
+        return state;
       }
       if (state.currentOperand === "0" && payload !== ".") {
         return {
@@ -89,7 +98,6 @@ const calculatorReducer = (
           currentOperand: payload,
         };
       }
-
       return {
         ...state,
         currentOperand: `${state.currentOperand}${payload}`,
@@ -107,14 +115,12 @@ const calculatorReducer = (
           operation: payload as Operation,
         };
       }
-
       if (state.currentOperand === "") {
         return {
           ...state,
           operation: payload as Operation,
         };
       }
-
       return {
         ...state,
         previousOperand: calculate(state),
@@ -122,7 +128,7 @@ const calculatorReducer = (
         operation: payload as Operation,
       };
 
-    case REDUCER_ACTION.CALCULATE:
+    case REDUCER_ACTION.EQUAL:
       if (
         state.currentOperand == "" ||
         state.previousOperand == "" ||
@@ -136,6 +142,31 @@ const calculatorReducer = (
         previousOperand: "",
         operation: "clear",
         overwrite: true,
+      };
+
+    case REDUCER_ACTION.PERCENT:
+      if (state.previousOperand === "") {
+        return {
+          ...state,
+          currentOperand: String(
+            percent(Number(state.previousOperand), Number(state.currentOperand))
+          ),
+          previousOperand: "",
+          operation: payload as Operation,
+        };
+      }
+
+      return {
+        ...state,
+        currentOperand: String(
+          processPercentage(
+            Number(state.previousOperand),
+            Number(state.currentOperand),
+            state.operation
+          )
+        ),
+        previousOperand: "",
+        operation: payload as Operation,
       };
 
     case REDUCER_ACTION.CLEAR:
@@ -174,6 +205,27 @@ const calculate = ({
   return String(result);
 };
 
+const percent = (previous: number, current: number) => {
+  if (isNaN(previous) || isNaN(current)) {
+    return 0;
+  }
+  const result = previous ? previous * (current / 100) : current / 100;
+  return result;
+};
+
+const processPercentage = (
+  prev: number,
+  curr: number,
+  operation: Omit<Operation, "clear" | "multiply" | "divide">
+): number => {
+  switch (operation) {
+    case "subtract":
+      return prev - percent(prev, curr);
+    default:
+      return prev + percent(prev, curr);
+  }
+};
+
 const App: FC = () => {
   const [{ currentOperand, previousOperand, operation }, dispatch] = useReducer(
     calculatorReducer,
@@ -182,20 +234,22 @@ const App: FC = () => {
 
   const handleDigitClick = (input: number | string) => {
     dispatch({ type: REDUCER_ACTION.ADD_DIGIT, payload: String(input) });
-    console.log(input);
   };
 
   const handleOperationClick = (operation: Operation) => {
     dispatch({ type: REDUCER_ACTION.OPERATE, payload: operation });
-    console.log(operation);
   };
 
   const equal = () => {
-    dispatch({ type: REDUCER_ACTION.CALCULATE, payload: "" });
+    dispatch({ type: REDUCER_ACTION.EQUAL, payload: "" });
   };
 
   const allClear = () => {
     dispatch({ type: REDUCER_ACTION.CLEAR, payload: "" });
+  };
+
+  const percent = () => {
+    dispatch({ type: REDUCER_ACTION.PERCENT, payload: "" });
   };
 
   const digitButton = (start: number, end: number) => {
@@ -242,7 +296,9 @@ const App: FC = () => {
           >
             <LightGrayButton onClick={allClear}>AC</LightGrayButton>
             <LightGrayButton>C</LightGrayButton>
-            <LightGrayButton>%</LightGrayButton>
+            <LightGrayButton onClick={percent}>
+              <AiOutlinePercentage className="text-3xl" />
+            </LightGrayButton>
             {operationButton("divide")}
             {digitButton(7, 9)}
             {operationButton("multiply")}
