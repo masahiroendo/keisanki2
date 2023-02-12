@@ -66,16 +66,17 @@ const calculatorReducer = (
 ): CalculatorState => {
   switch (type) {
     case REDUCER_ACTION.ADD_DIGIT:
-      if (state.overwrite && state.currentOperand === "" && payload !== ".") {
+      // if (state.overwrite && state.currentOperand === "" && payload !== ".") {
+      if (state.overwrite) {
         return {
           ...state,
-          currentOperand: payload,
+          currentOperand: payload === "." ? "0" + payload : payload,
           overwrite: false,
         };
       }
 
       if (
-        state.currentOperand === "" &&
+        // state.currentOperand === "" &&
         !!state.previousOperand &&
         payload === "."
       ) {
@@ -169,6 +170,20 @@ const calculatorReducer = (
         operation: payload as Operation,
       };
 
+    case REDUCER_ACTION.DELETE_DIGIT:
+      if (state.overwrite) {
+        return {
+          ...initState,
+        };
+      }
+      if (state.currentOperand === "") {
+        return state;
+      }
+      return {
+        ...state,
+        currentOperand: "0",
+      };
+
     case REDUCER_ACTION.CLEAR:
       return { ...initState };
 
@@ -248,6 +263,10 @@ const App: FC = () => {
     dispatch({ type: REDUCER_ACTION.CLEAR, payload: "" });
   };
 
+  const deleteDigit = () => {
+    dispatch({ type: REDUCER_ACTION.DELETE_DIGIT, payload: "" });
+  };
+
   const percent = () => {
     dispatch({ type: REDUCER_ACTION.PERCENT, payload: "" });
   };
@@ -274,11 +293,11 @@ const App: FC = () => {
       <div className="flex justify-center items-center min-h-screen bg-[#333]">
         <div
           id="calculator-container"
-          className="relative min-w-[400px] min-h-[600px] bg-[#333] rounded-[20px] p-10 px-[30px] shadow-calculatorContainer "
+          className="relative w-[400px] min-h-[600px] bg-[#333] rounded-[20px] p-10 px-[30px] shadow-calculatorContainer "
         >
           <div
             id="calculator-screen"
-            className="relative flex flex-col items-end justify-around bg-[#a7af7c] p-[0.75rem] mx-2 mb-[0.75rem] rounded-xl break-words break-all shadow-[0_0_0_2px_rgba(0,0,0,0.75)] select-none"
+            className="relative flex flex-col items-end justify-around bg-[#a7af7c] p-[0.75rem] mx-2 mb-[0.75rem] min-h-[120px] rounded-xl break-words break-all shadow-[0_0_0_2px_rgba(0,0,0,0.75)] select-none"
           >
             <div
               id="previous-operand"
@@ -295,7 +314,7 @@ const App: FC = () => {
             className="relative grid grid-cols-calculator auto-rows-calculator"
           >
             <LightGrayButton onClick={allClear}>AC</LightGrayButton>
-            <LightGrayButton>C</LightGrayButton>
+            <LightGrayButton onClick={deleteDigit}>C</LightGrayButton>
             <LightGrayButton onClick={percent}>
               <AiOutlinePercentage className="text-3xl" />
             </LightGrayButton>
