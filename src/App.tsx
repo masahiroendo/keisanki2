@@ -13,6 +13,7 @@ import {
 import { AiOutlineClear, AiOutlinePercentage } from "react-icons/ai";
 import { TbEqual } from "react-icons/tb";
 import { IconType } from "react-icons";
+import ThemeSwitchButton from "./component/ThemeSwitchButton";
 
 const operationSymbols: Record<string, string> = {
   clear: "",
@@ -290,14 +291,17 @@ const App: FC = () => {
 
   return (
     <div className="p-0 m-0 box-border before:box-border after:box-border font-roboto">
-      <div className="flex justify-center items-center min-h-screen bg-[#333]">
+      <div className="flex justify-center items-center min-h-screen bg-[#333] dark:bg-[#e1e0e0] ease-in-out duration-300">
         <div
           id="calculator-container"
-          className="relative w-[400px] min-h-[600px] bg-[#333] rounded-[20px] p-10 px-[30px] shadow-calculatorContainer "
+          className="relative w-[430px] min-h-[600px] bg-[#333] rounded-[20px] p-10 px-[30px] shadow-calculatorContainer 
+          dark:bg-[#e1e0e0] dark:shadow-calculatorContainerLight ease-in-out duration-300"
         >
+          <ThemeSwitchButton />
           <div
             id="calculator-screen"
-            className="relative flex flex-col items-end justify-around bg-[#a7af7c] p-[0.75rem] mx-2 mb-[0.75rem] min-h-[120px] rounded-xl break-words break-all shadow-[0_0_0_2px_rgba(0,0,0,0.75)] select-none"
+            className="relative flex flex-col items-end justify-around bg-[#a7af7c] p-[0.75rem] mx-2 mb-[0.75rem] min-h-[120px] 
+            rounded-xl break-words break-all shadow-[0_0_0_2px_rgba(0,0,0,0.75)] select-none"
           >
             <div
               id="previous-operand"
@@ -311,7 +315,7 @@ const App: FC = () => {
           </div>
           <div
             id="button"
-            className="relative grid grid-cols-calculator auto-rows-calculator"
+            className="relative grid grid-cols-calculator auto-rows-calculator gap-3"
           >
             <LightGrayButton onClick={allClear}>AC</LightGrayButton>
             <LightGrayButton onClick={deleteDigit}>C</LightGrayButton>
@@ -321,13 +325,10 @@ const App: FC = () => {
             {operationButton("divide")}
             {digitButton(7, 9)}
             {operationButton("multiply")}
-
             {digitButton(4, 6)}
             {operationButton("add")}
-
             {digitButton(1, 3)}
             {operationButton("subtract")}
-
             <Button
               className="col-span-2 w-full"
               onClick={() => handleDigitClick("0")}
